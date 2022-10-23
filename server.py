@@ -5,6 +5,8 @@ HOST = '127.0.0.1'
 PORT = 1234 
 LISTENER_LIMIT = 5
 active_clients = [] 
+aktif_kullanicilar = []
+
 def listen_for_messages(client, username):
 
     while 1:
@@ -39,6 +41,10 @@ def client_handler(client):
         username = client.recv(2048).decode('utf-8')
         if username != '':
             active_clients.append((username, client))
+            #print(active_clients)
+            # aktif_kullanicilar.append(username)
+            # print(aktif_kullanicilar)
+            #kullanici_listesi(username)
             prompt_message = "SERVER~" + f"{username} added to the chat"
             send_messages_to_all(prompt_message)
             break
@@ -47,6 +53,11 @@ def client_handler(client):
 
     threading.Thread(target=listen_for_messages, args=(client, username, )).start()
 
+
+# def kullanici_listesi(username):
+#     aktif_kullanicilar.append(username)
+#     print(aktif_kullanicilar)
+#     return aktif_kullanicilar
 
 def main():
 

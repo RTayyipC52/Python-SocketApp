@@ -1,5 +1,8 @@
 import tkinter as tk
 from tkinter import ANCHOR, scrolledtext
+from server import active_clients
+from server import aktif_kullanicilar
+#from server import kullanici_listesi
 import socket
 import threading
 from tkinter import messagebox
@@ -14,6 +17,10 @@ master.resizable(False, False)
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 def connect():
+    username = username_textbox.get()
+    aktif_kullanicilar.append(username)
+    print(aktif_kullanicilar)
+
     def add_message(message):
         message_box2.config(state=tk.NORMAL)
         message_box2.insert(tk.END, message + '\n')
@@ -26,7 +33,7 @@ def connect():
     except:
         messagebox.showerror("Unable to connect to server", f"Unable to connect to server {HOST} {PORT}")
 
-    username = username_textbox.get()
+    #username = username_textbox.get()
     if username != '':
         client.sendall(username.encode())
     else:
@@ -36,6 +43,11 @@ def connect():
     username_button.config(state=tk.DISABLED)
 
     #master.destroy()
+
+    aktif_kullanici_listesi = aktif_kullanicilar # Burası ayarlanacak tüm kullanıcılar gelmeli
+    # print(aktif_kullanici_listesi)
+    # for kullanici in aktif_kullanici_listesi:
+    #     print(kullanici)
 
     kullanicilar = tk.Tk()
     kullanicilar.geometry("600x600+500+100")
@@ -49,6 +61,9 @@ def connect():
     main.pack()
 
     listbox = tk.Listbox(kullanicilar,selectmode=tk.SINGLE)
+    for k in aktif_kullanici_listesi:
+        listbox.insert("end", k)
+        listbox.place(relx=0.05, rely=0.05, relwidth=0.4, relheight=0.9)
 
     def sec():
         kisi = listbox.get(ANCHOR)

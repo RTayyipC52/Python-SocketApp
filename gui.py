@@ -1,6 +1,7 @@
 import tkinter as tk
-from tkinter import scrolledtext
+from tkinter import ANCHOR, scrolledtext
 import socket
+import threading
 from tkinter import messagebox
 
 HOST = '127.0.0.1'
@@ -49,7 +50,66 @@ def connect():
 
     listbox = tk.Listbox(kullanicilar,selectmode=tk.SINGLE)
 
-    btn = tk.Button(kullanicilar,text="Seç" ,command=kullanicilar.destroy)
+    def sec():
+        kisi = listbox.get(ANCHOR)
+        sohbet_penceresi = tk.Tk()
+        sohbet_penceresi.geometry("600x600+500+100")
+        sohbet_penceresi.title(str(kisi) +" Sohbeti")
+        sohbet_penceresi.resizable(False, False)
+        govde = tk.Frame(sohbet_penceresi, bg="#add8e6")
+        govde.place(relx=0.01, rely=0.01, relwidth=0.95, relheight=0.95)
+
+        soh = tk.StringVar()
+        soh.set(kisi)
+
+        sayi = tk.IntVar()
+        sayi.set(0)
+
+        message_box = scrolledtext.ScrolledText(govde, bg='#ECF7FA', fg='black', width=67, height=26.5)
+        message_box.config(state=tk.DISABLED)
+        message_box.place(relx=0.01, rely=0.07, relwidth=0.98, relheight=0.75)
+        
+        def add_message(message):
+            message_box.config(state=tk.NORMAL)
+            message_box.insert(tk.END, message + '\n')
+            message_box.config(state=tk.DISABLED)
+        
+        def listen_for_messages_from_server(client):
+
+            while 1:
+
+                message = client.recv(2048).decode('utf-8')
+                if message != '':
+                    username = message.split("~")[0]
+                    content = message.split('~')[1]
+
+                    add_message(f"[{username}] {content}")
+                    
+                else:
+                    messagebox.showerror("Error", "Message recevied from client is empty")
+
+        threading.Thread(target=listen_for_messages_from_server, args=(client, )).start()
+
+        def send_message():
+            message = message_textbox.get("1.0","end")
+            if message != '':
+                client.sendall(message.encode())
+                message_textbox.delete("1.0","end")
+            else:
+                messagebox.showerror("Empty message", "Message cannot be empty")
+
+        metin = tk.Label(govde, text="Chat",font="Times 17 bold", fg='red', bg='black')
+        metin.pack()
+
+        message_textbox = tk.Text(govde, height=5, width=60)
+        message_textbox.tag_configure('style',foreground="#bfbfbf", font='Times 10 italic')
+        message_textbox.place(relx=0.01, rely=0.83)
+
+        message_button = tk.Button(govde, text="Gönder", command=send_message)
+        message_button.place(relx=0.87, rely=0.83)
+        sohbet_penceresi.mainloop()
+        
+    btn = tk.Button(kullanicilar,text="Seç" ,command=sec)
     btn.place(x=400,y=550)
 
     kullanicilar.mainloop()

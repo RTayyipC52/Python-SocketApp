@@ -30,7 +30,6 @@ message_box2 = scrolledtext.ScrolledText(frame, bg='#ECF7FA', fg='black', width=
 message_box2.config(state=tk.DISABLED)
 message_box2.place(relx=0.1, rely=0.5, relwidth=0.8, relheight=0.4)
 
-# main function
 def main():
 
     master.mainloop()

@@ -41,23 +41,18 @@ def client_handler(client):
         username = client.recv(2048).decode('utf-8')
         if username != '':
             active_clients.append((username, client))
-            #print(active_clients)
-            # aktif_kullanicilar.append(username)
-            # print(aktif_kullanicilar)
-            #kullanici_listesi(username)
-            prompt_message = "SERVER~" + f"{username} added to the chat"
-            send_messages_to_all(prompt_message)
+            aktif_kullanicilar.append(username)
+            print(aktif_kullanicilar)
+            c = aktif_kullanicilar
+            list_message = ' '.join(c)
+            send_messages_to_all(list_message)
+            # prompt_message = "SERVER~" + f"{username} added to the chat"
+            # send_messages_to_all(prompt_message)
             break
         else:
             print("Client username is empty")
 
     threading.Thread(target=listen_for_messages, args=(client, username, )).start()
-
-
-# def kullanici_listesi(username):
-#     aktif_kullanicilar.append(username)
-#     print(aktif_kullanicilar)
-#     return aktif_kullanicilar
 
 def main():
 

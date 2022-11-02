@@ -12,13 +12,12 @@ def listen_for_messages(client, username):
     while 1:
         message = client.recv(2048).decode('utf-8')
         if message != '':
-            #print(message)
             sohbet = message.split("&")
             print(sohbet)
             gonderilecek_mesaj = sohbet[0]
             gonderilecek_kisi = sohbet[1]
             gonderen_kisi = sohbet[2]
-            final_msg = username + '~' + gonderilecek_mesaj
+            final_msg = username + '~' + gonderilecek_mesaj + '~' + gonderilecek_kisi
             send_messages_to_one(final_msg, gonderilecek_kisi, gonderen_kisi)
 
         else:

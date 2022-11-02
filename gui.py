@@ -48,7 +48,7 @@ def connect():
     main = tk.Canvas(kullanicilar, height=700, width=700, bg="#add8e6")
     main.pack()
 
-    frame = tk.Frame(main, bg="blue")
+    frame = tk.Frame(main, bg="#66B2FF")
     frame.place(relx=0.25, rely=0.01, relheight=0.9, relwidth=0.7)
 
     message_box = scrolledtext.ScrolledText(frame, bg='#ECF7FA', fg='black', width=67, height=26.5)
@@ -65,8 +65,7 @@ def connect():
         message2 = listbox.get(ANCHOR)
         message3 = username
         message = message1 + "&" + message2 + "&" + message3
-        #print(message)
-        if message1 == '':
+        if message1 == '\n':
             messagebox.showerror("Boş Mesaj", "Boş mesaj gönderemezsiniz")
         elif message2 == '':
             messagebox.showerror("Kullanıcı Seçilmedi", "Lütfen mesajlaşmak için listeden bir kullanıcı seçiniz")
@@ -93,76 +92,73 @@ def connect():
     def listen_for_lists_from_server(client):
         while 1 :
             message = client.recv(2048).decode('utf-8')
-            #print(message)
             if (('~' not in message)):
-                #print(message + " list")
                 soh = message.split(' ')
                 for kullanici in soh:
                     add_list(f"{kullanici}")
-                #frame.destroy()
             else:
                 username = message.split("~")[0]
-                content = message.split('~')[1]
-                #print(message + " message")
-                add_message(f"[{username}] {content}")
+                content = message.split("~")[1]
+                gonderilen = message.split("~")[2]
+                add_message(f"[{username}] → [{gonderilen}] {content} ")
 
     threading.Thread(target=listen_for_lists_from_server, args=(client, )).start()
 
-    def sec():
-        kisi = listbox.get(ANCHOR)
-        kullanicilar.destroy()
-        sohbet_penceresi = tk.Tk()
-        sohbet_penceresi.geometry("600x600+500+100")
-        sohbet_penceresi.title(str(kisi) +" Sohbeti")
-        sohbet_penceresi.resizable(False, False)
-        govde = tk.Frame(sohbet_penceresi, bg="#add8e6")
-        govde.place(relx=0.01, rely=0.01, relwidth=0.95, relheight=0.95)
+    # def sec():
+    #     kisi = listbox.get(ANCHOR)
+    #     kullanicilar.destroy()
+    #     sohbet_penceresi = tk.Tk()
+    #     sohbet_penceresi.geometry("600x600+500+100")
+    #     sohbet_penceresi.title(str(kisi) +" Sohbeti")
+    #     sohbet_penceresi.resizable(False, False)
+    #     govde = tk.Frame(sohbet_penceresi, bg="#add8e6")
+    #     govde.place(relx=0.01, rely=0.01, relwidth=0.95, relheight=0.95)
 
-        message_box = scrolledtext.ScrolledText(govde, bg='#ECF7FA', fg='black', width=67, height=26.5)
-        message_box.config(state=tk.DISABLED)
-        message_box.place(relx=0.01, rely=0.07, relwidth=0.98, relheight=0.75)
+    #     message_box = scrolledtext.ScrolledText(govde, bg='#ECF7FA', fg='black', width=67, height=26.5)
+    #     message_box.config(state=tk.DISABLED)
+    #     message_box.place(relx=0.01, rely=0.07, relwidth=0.98, relheight=0.75)
         
-        # def add_message(message):
-        #     message_box.config(state=tk.NORMAL)
-        #     message_box.insert(tk.END, message + '\n')
-        #     message_box.config(state=tk.DISABLED)
+    #     # def add_message(message):
+    #     #     message_box.config(state=tk.NORMAL)
+    #     #     message_box.insert(tk.END, message + '\n')
+    #     #     message_box.config(state=tk.DISABLED)
         
-        # def listen_for_messages_from_server(client, kisi):
+    #     # def listen_for_messages_from_server(client, kisi):
 
-        #     while 1:
-        #         message = client.recv(2048).decode('utf-8')
-        #         if message != '':
-        #             username = message.split("~")[0]
-        #             content = message.split('~')[1]
+    #     #     while 1:
+    #     #         message = client.recv(2048).decode('utf-8')
+    #     #         if message != '':
+    #     #             username = message.split("~")[0]
+    #     #             content = message.split('~')[1]
 
-        #             add_message(f"[{username}] {content} {kisi}")
+    #     #             add_message(f"[{username}] {content} {kisi}")
                     
-        #         else:
-        #             messagebox.showerror("Error", "Message recevied from client is empty")
+    #     #         else:
+    #     #             messagebox.showerror("Error", "Message recevied from client is empty")
 
-        # #threading.Thread(target=listen_for_messages_from_server, args=(client, kisi,)).start()
+    #     # #threading.Thread(target=listen_for_messages_from_server, args=(client, kisi,)).start()
 
-        # def send_message():
-        #     message = message_textbox.get("1.0","end")
-        #     if message != '':
-        #         client.sendall(message.encode())
-        #         message_textbox.delete("1.0","end")
-        #     else:
-        #         messagebox.showerror("Empty message", "Message cannot be empty")
+    #     # def send_message():
+    #     #     message = message_textbox.get("1.0","end")
+    #     #     if message != '':
+    #     #         client.sendall(message.encode())
+    #     #         message_textbox.delete("1.0","end")
+    #     #     else:
+    #     #         messagebox.showerror("Empty message", "Message cannot be empty")
 
-        metin = tk.Label(govde, text="Chat",font="Times 17 bold", fg='red', bg='black')
-        metin.pack()
+    #     metin = tk.Label(govde, text="Chat",font="Times 17 bold", fg='red', bg='black')
+    #     metin.pack()
 
-        message_textbox = tk.Text(govde, height=5, width=60)
-        message_textbox.tag_configure('style',foreground="#bfbfbf", font='Times 10 italic')
-        message_textbox.place(relx=0.01, rely=0.83)
+    #     message_textbox = tk.Text(govde, height=5, width=60)
+    #     message_textbox.tag_configure('style',foreground="#bfbfbf", font='Times 10 italic')
+    #     message_textbox.place(relx=0.01, rely=0.83)
 
-        message_button = tk.Button(govde, text="Gönder", command=send_message)
-        message_button.place(relx=0.87, rely=0.83)
-        sohbet_penceresi.mainloop()
+    #     message_button = tk.Button(govde, text="Gönder", command=send_message)
+    #     message_button.place(relx=0.87, rely=0.83)
+    #     sohbet_penceresi.mainloop()
         
-    btn = tk.Button(kullanicilar,text="Seç" ,command=sec)
-    btn.place(x=400,y=700)
+    # btn = tk.Button(kullanicilar,text="Seç" ,command=sec)
+    # btn.place(x=400,y=700)
     
     kullanicilar.mainloop()
     

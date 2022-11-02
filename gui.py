@@ -61,12 +61,20 @@ def connect():
         message_box.config(state=tk.DISABLED)
 
     def send_message():
-        message = message_textbox.get("1.0","end")
-        if message != '':
+        message1 = message_textbox.get("1.0","end")
+        message2 = listbox.get(ANCHOR)
+        message3 = username
+        message = message1 + "&" + message2 + "&" + message3
+        #print(message)
+        if message1 == '':
+            messagebox.showerror("Boş Mesaj", "Boş mesaj gönderemezsiniz")
+        elif message2 == '':
+            messagebox.showerror("Kullanıcı Seçilmedi", "Lütfen mesajlaşmak için listeden bir kullanıcı seçiniz")
+        elif message3 == message2:
+            messagebox.showerror("Kendinizi Seçtiniz", "Lütfen mesajlaşmak için başka bir kullanıcı seçiniz")
+        else:
             client.sendall(message.encode())
             message_textbox.delete("1.0","end")
-        else:
-            messagebox.showerror("Empty message", "Message cannot be empty")
 
     message_textbox = tk.Text(frame, height=5, width=60)
     message_textbox.tag_configure('style',foreground="#bfbfbf", font='Times 10 italic')
@@ -85,10 +93,9 @@ def connect():
     def listen_for_lists_from_server(client):
         while 1 :
             message = client.recv(2048).decode('utf-8')
-            print(message)
-            
+            #print(message)
             if (('~' not in message)):
-                print(message + " list")
+                #print(message + " list")
                 soh = message.split(' ')
                 for kullanici in soh:
                     add_list(f"{kullanici}")
@@ -96,7 +103,7 @@ def connect():
             else:
                 username = message.split("~")[0]
                 content = message.split('~')[1]
-                print(message + " message")
+                #print(message + " message")
                 add_message(f"[{username}] {content}")
 
     threading.Thread(target=listen_for_lists_from_server, args=(client, )).start()
@@ -120,7 +127,7 @@ def connect():
         #     message_box.insert(tk.END, message + '\n')
         #     message_box.config(state=tk.DISABLED)
         
-        # def listen_for_messages_from_server(client):
+        # def listen_for_messages_from_server(client, kisi):
 
         #     while 1:
         #         message = client.recv(2048).decode('utf-8')
@@ -128,12 +135,12 @@ def connect():
         #             username = message.split("~")[0]
         #             content = message.split('~')[1]
 
-        #             add_message(f"[{username}] {content}")
+        #             add_message(f"[{username}] {content} {kisi}")
                     
         #         else:
         #             messagebox.showerror("Error", "Message recevied from client is empty")
 
-        ##threading.Thread(target=listen_for_messages_from_server, args=(client, )).start()
+        # #threading.Thread(target=listen_for_messages_from_server, args=(client, kisi,)).start()
 
         # def send_message():
         #     message = message_textbox.get("1.0","end")
@@ -185,7 +192,6 @@ username_button.place(x=175,y=100)
 # message_box2.place(relx=0.1, rely=0.5, relwidth=0.8, relheight=0.4)
 
 def main():
-
     master.mainloop()
     
 if __name__ == '__main__':

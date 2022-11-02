@@ -10,12 +10,16 @@ aktif_kullanicilar = []
 def listen_for_messages(client, username):
 
     while 1:
-
         message = client.recv(2048).decode('utf-8')
         if message != '':
-            
-            final_msg = username + '~' + message
-            send_messages_to_all(final_msg)
+            #print(message)
+            sohbet = message.split("&")
+            print(sohbet)
+            gonderilecek_mesaj = sohbet[0]
+            gonderilecek_kisi = sohbet[1]
+            gonderen_kisi = sohbet[2]
+            final_msg = username + '~' + gonderilecek_mesaj
+            send_messages_to_one(final_msg, gonderilecek_kisi, gonderen_kisi)
 
         else:
             print(f"The message send from client {username} is empty")
@@ -24,25 +28,29 @@ def listen_for_messages(client, username):
 def send_message_to_client(client, message):
 
     client.sendall(message.encode())
-    
 
-def send_messages_to_all(message):
+def send_messages_to_one(message, gonderilecek_kisi, gonderen_kisi):
     
     for user in active_clients:
+        if user[0] == gonderilecek_kisi:
+            send_message_to_client(user[1], message)
 
+    for user2 in active_clients:
+        if user2[0] == gonderen_kisi:
+            send_message_to_client(user2[1], message)    
+
+def send_messages_to_all(message):
+
+    for user in active_clients:
         send_message_to_client(user[1], message)
-
 
 def client_handler(client):
     
-    
     while 1:
-
         username = client.recv(2048).decode('utf-8')
         if username != '':
             active_clients.append((username, client))
             aktif_kullanicilar.append(username)
-            print(aktif_kullanicilar)
             c = aktif_kullanicilar
             list_message = ' '.join(c)
             send_messages_to_all(list_message)
@@ -58,7 +66,6 @@ def main():
 
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     
-    
     try:
         
         server.bind((HOST, PORT))
@@ -66,10 +73,8 @@ def main():
     except:
         print(f"Unable to bind to host {HOST} and port {PORT}")
 
-    
     server.listen(LISTENER_LIMIT)
 
-    
     while 1:
 
         client, address = server.accept()

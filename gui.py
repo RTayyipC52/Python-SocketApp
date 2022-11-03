@@ -3,6 +3,7 @@ from tkinter import ANCHOR, scrolledtext
 import socket
 import threading
 from tkinter import messagebox
+from tkinter import filedialog as fd
 
 HOST = '127.0.0.1'
 PORT = 1234
@@ -104,6 +105,36 @@ def connect():
 
     threading.Thread(target=listen_for_lists_from_server, args=(client, )).start()
 
+    def send_image(i):
+        message1 = str(i)
+        message2 = listbox.get(ANCHOR)
+        message3 = username
+        message = message1 + "&" + message2 + "&" + message3
+        if message1 == '\n':
+            messagebox.showerror("Boş Mesaj", "Boş mesaj gönderemezsiniz")
+        elif message2 == '':
+            messagebox.showerror("Kullanıcı Seçilmedi", "Lütfen mesajlaşmak için listeden bir kullanıcı seçiniz")
+        elif message3 == message2:
+            messagebox.showerror("Kendinizi Seçtiniz", "Lütfen mesajlaşmak için başka bir kullanıcı seçiniz")
+        else:
+            client.sendall(message.encode())
+
+    def openfile():
+        filetypes = (
+            ('PNG', '*.png'),
+            ('All files', '*.*')
+        )
+
+        file = fd.askopenfile(
+            initialdir='/',
+            filetypes=filetypes)
+
+        foto = str(file.name)
+        image = open(foto,"rb")
+        for i in image:
+            print(i)
+            #send_image(i)
+
     # def sec():
     #     kisi = listbox.get(ANCHOR)
     #     kullanicilar.destroy()
@@ -159,6 +190,9 @@ def connect():
         
     # btn = tk.Button(kullanicilar,text="Seç" ,command=sec)
     # btn.place(x=400,y=700)
+
+    btn = tk.Button(kullanicilar,text="Dosya Seç" ,command=openfile)
+    btn.place(x=400,y=700)
     
     kullanicilar.mainloop()
     

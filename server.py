@@ -8,22 +8,29 @@ active_clients = []
 aktif_kullanicilar = []
 
 def listen_for_messages(client, username):
-
+    file = open('indir.jpg', "wb")
     while 1:
-        message = client.recv(2048).decode('utf-8')
-        if message != '':
-            sohbet = message.split("&")
-            print(sohbet)
-            gonderilecek_mesaj = sohbet[0]
-            gonderilecek_kisi = sohbet[1]
-            gonderen_kisi = sohbet[2]
-            final_msg = username + '~' + gonderilecek_mesaj + '~' + gonderilecek_kisi
-            send_messages_to_one(final_msg, gonderilecek_kisi, gonderen_kisi)
-
+        message = client.recv(2048)
+        if((b'*****' not in message)):
+            while message:
+                file.write(message)
+                message = client.recv(2048)
+            file.close()
         else:
-            print(f"The message send from client {username} is empty")
+            mesaj = message.decode("utf-8")
+            file.close()
+            if mesaj != '':
+                sohbet = mesaj.split("&")
+                print(sohbet)
+                gonderilecek_mesaj = sohbet[0]
+                gonderilecek_kisi = sohbet[1]
+                gonderen_kisi = sohbet[2]
+                final_msg = username + '~' + gonderilecek_mesaj + '~' + gonderilecek_kisi
+                send_messages_to_one(final_msg, gonderilecek_kisi, gonderen_kisi)
 
-
+            else:
+                print(f"The message send from client {username} is empty")
+            
 def send_message_to_client(client, message):
 
     client.sendall(message.encode())

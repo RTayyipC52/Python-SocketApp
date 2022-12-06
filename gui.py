@@ -58,7 +58,7 @@ def connect():
         message_box.config(state=tk.DISABLED)
 
     def send_message():
-        message1 = "*****" + message_textbox.get("1.0","end")
+        message1 = "*****" + "&" + message_textbox.get("1.0","end")
         message2 = listbox.get(ANCHOR)
         message3 = username
         message = str(message1) + "&" + message2 + "&" + message3

@@ -15,16 +15,14 @@ def listen_for_messages(client, username):
             while message:
                 file.write(message)
                 message = client.recv(2048)
-            file.close()
         else:
             mesaj = message.decode("utf-8")
-            file.close()
             if mesaj != '':
                 sohbet = mesaj.split("&")
                 print(sohbet)
-                gonderilecek_mesaj = sohbet[0]
-                gonderilecek_kisi = sohbet[1]
-                gonderen_kisi = sohbet[2]
+                gonderilecek_mesaj = sohbet[1]
+                gonderilecek_kisi = sohbet[2]
+                gonderen_kisi = sohbet[3]
                 final_msg = username + '~' + gonderilecek_mesaj + '~' + gonderilecek_kisi
                 send_messages_to_one(final_msg, gonderilecek_kisi, gonderen_kisi)
 

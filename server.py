@@ -1,20 +1,26 @@
 import socket
 import threading
 
-HOST = '127.0.0.1'
+HOST = '192.168.179.19'
 PORT = 1234 
 LISTENER_LIMIT = 5
 active_clients = [] 
 aktif_kullanicilar = []
 
 def listen_for_messages(client, username):
-    file = open('indir.jpg', "wb")
     while 1:
         message = client.recv(2048)
         if((b'*****' not in message)):
             while message:
-                file.write(message)
+                send_image_to_all(message)
                 message = client.recv(2048)
+                if len(message)<2048:
+                    send_image_to_all(message)
+                    print("while bitti")
+                    break
+            print("while sonlandı")
+
+                
         else:
             mesaj = message.decode("utf-8")
             if mesaj != '':
@@ -23,15 +29,17 @@ def listen_for_messages(client, username):
                 gonderilecek_mesaj = sohbet[1]
                 gonderilecek_kisi = sohbet[2]
                 gonderen_kisi = sohbet[3]
-                final_msg = username + '~' + gonderilecek_mesaj + '~' + gonderilecek_kisi
+                final_msg = "text_from_server," + username + '~' + gonderilecek_mesaj + '~' + gonderilecek_kisi
                 send_messages_to_one(final_msg, gonderilecek_kisi, gonderen_kisi)
 
             else:
                 print(f"The message send from client {username} is empty")
             
 def send_message_to_client(client, message):
-
     client.sendall(message.encode())
+
+def send_image_to_client(client, message):
+    client.send(message)
 
 def send_messages_to_one(message, gonderilecek_kisi, gonderen_kisi):
     
@@ -48,6 +56,11 @@ def send_messages_to_all(message):
     for user in active_clients:
         send_message_to_client(user[1], message)
 
+def send_image_to_all(message):
+
+    for user in active_clients:
+        send_image_to_client(user[1], message)
+
 def client_handler(client):
     
     while 1:
@@ -57,7 +70,7 @@ def client_handler(client):
             aktif_kullanicilar.append(username)
             c = aktif_kullanicilar
             list_message = ' '.join(c)
-            send_messages_to_all(list_message)
+            send_messages_to_all("text_from_server," + list_message)
             # prompt_message = "SERVER~" + f"{username} added to the chat"
             # send_messages_to_all(prompt_message)
             break

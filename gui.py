@@ -88,16 +88,32 @@ def connect():
         
     def listen_for_lists_from_server(client):
         while 1 :
-            message = client.recv(2048).decode('utf-8')
-            if (('~' not in message)):
-                soh = message.split(' ')
-                for kullanici in soh:
-                    add_list(f"{kullanici}")
+            ilk_mesaj= client.recv(2048)
+            print(ilk_mesaj)
+            if ("text_from_server" not in str(ilk_mesaj)):
+                file = open('indir.jpg', "wb")
+                while ilk_mesaj:
+                    print("resim geldi")
+                    file.write(ilk_mesaj)
+                    ilk_mesaj = client.recv(2048)
+                    if len(ilk_mesaj)<2048:
+                        file.write(ilk_mesaj)
+                        file.close()
+                        break
+                    print("resim alındı")
             else:
-                username = message.split("~")[0]
-                content = message.split("~")[1]
-                gonderilen = message.split("~")[2]
-                add_message(f"[{username}] → [{gonderilen}] {content} ")
+                print("mesaj geldi")
+                message = str(ilk_mesaj).replace("\'","").split(",")[1]
+                if (('~' not in message)):
+                    soh = message.split(' ')
+                    for kullanici in soh:
+                        add_list(f"{kullanici}")
+                else:
+                    username = message.split("~")[0]
+                    content = str(message.split("~")[1])
+                    mesaj = content.replace("\\n","")
+                    gonderilen = message.split("~")[2]
+                    add_message(f"[{username}] → [{gonderilen}] {mesaj} ")
 
     threading.Thread(target=listen_for_lists_from_server, args=(client, )).start()
 

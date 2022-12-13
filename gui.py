@@ -104,7 +104,7 @@ def connect():
             else:
                 tam_mesaj = ilk_mesaj.decode("utf-8")
                 print("mesaj geldi")
-                message = tam_mesaj.replace("\'","").split(",")[1]
+                message = tam_mesaj.split(",")[1]
                 if (('~' not in message)):
                     soh = message.split(' ')
                     for kullanici in soh:

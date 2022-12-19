@@ -5,32 +5,30 @@ HOST = '127.0.0.1'
 PORT = 1234 
 LISTENER_LIMIT = 5
 active_clients = [] 
-aktif_kullanicilar = []
+active_users = []
 
 def listen_for_messages(client, username):
     while 1:
         message = client.recv(2048)
-        if((b'*****' not in message)):
+        if((b'*****' not in message)): # image
             while message:
                 send_image_to_all(message)
                 message = client.recv(2048)
                 if len(message)<2048:
                     send_image_to_all(message)
-                    print("while bitti")
                     break
-            print("while sonlandı")
+            print("while loop finished")
 
-                
-        else:
-            mesaj = message.decode("utf-8")
-            if mesaj != '':
-                sohbet = mesaj.split("&")
-                print(sohbet)
-                gonderilecek_mesaj = sohbet[1]
-                gonderilecek_kisi = sohbet[2]
-                gonderen_kisi = sohbet[3]
-                final_msg = "text_from_server," + username + '~' + gonderilecek_mesaj + '~' + gonderilecek_kisi
-                send_messages_to_one(final_msg, gonderilecek_kisi, gonderen_kisi)
+        else: # message
+            incoming_message = message.decode("utf-8")
+            if incoming_message != '':
+                chat = incoming_message.split("&")
+                print(chat)
+                message_to_be_send = chat[1]
+                person_to_be_send = chat[2]
+                sender = chat[3]
+                final_message = "message_from_server," + username + '~' + message_to_be_send + '~' + person_to_be_send
+                send_messages_to_one(final_message, person_to_be_send, sender)
 
             else:
                 print(f"The message send from client {username} is empty")
@@ -41,22 +39,22 @@ def send_message_to_client(client, message):
 def send_image_to_client(client, message):
     client.send(message)
 
-def send_messages_to_one(message, gonderilecek_kisi, gonderen_kisi):
+def send_messages_to_one(message, person_to_be_send, sender): # Only sends message to the sender and person to be send 
     
     for user in active_clients:
-        if user[0] == gonderilecek_kisi:
+        if user[0] == person_to_be_send:
             send_message_to_client(user[1], message)
 
     for user2 in active_clients:
-        if user2[0] == gonderen_kisi:
+        if user2[0] == sender:
             send_message_to_client(user2[1], message)    
 
-def send_messages_to_all(message):
+def send_messages_to_all(message): # Sends message to all users
 
     for user in active_clients:
         send_message_to_client(user[1], message)
 
-def send_image_to_all(message):
+def send_image_to_all(message): # Sends image bits to the all users
 
     for user in active_clients:
         send_image_to_client(user[1], message)
@@ -67,12 +65,10 @@ def client_handler(client):
         username = client.recv(2048).decode('utf-8')
         if username != '':
             active_clients.append((username, client))
-            aktif_kullanicilar.append(username)
-            c = aktif_kullanicilar
+            active_users.append(username)
+            c = active_users
             list_message = ' '.join(c)
-            send_messages_to_all("text_from_server," + list_message)
-            # prompt_message = "SERVER~" + f"{username} added to the chat"
-            # send_messages_to_all(prompt_message)
+            send_messages_to_all("message_from_server," + list_message) # Sends logged in users to the client
             break
         else:
             print("Client username is empty")
